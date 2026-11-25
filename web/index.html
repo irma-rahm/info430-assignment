@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f5ef">
+    <title>Penguin Field Notes</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #19333a;
+        --muted: #64777a;
+        --paper: #f6f5ef;
+        --card: #fffefa;
+        --line: #e2e5dc;
+        --teal: #176b68;
+        --teal-dark: #105451;
+        --coral: #e78969;
+        --wash: #e8f1ed;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 88% 5%, rgba(231, 137, 105, 0.13), transparent 25rem),
+          var(--paper);
+        color: var(--ink);
+        font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      .page-shell {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 78px;
+        border-bottom: 1px solid rgba(25, 51, 58, 0.12);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-size: 0.95rem;
+        font-weight: 750;
+        letter-spacing: 0.01em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 35px;
+        height: 35px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--teal);
+        color: white;
+        font-size: 1.1rem;
+      }
+
+      .edition {
+        color: var(--muted);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      main {
+        padding: 58px 0 70px;
+      }
+
+      .intro {
+        max-width: 690px;
+        margin-bottom: 32px;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--teal);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 660px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        font-weight: 500;
+        letter-spacing: -0.045em;
+        line-height: 1.03;
+      }
+
+      .intro-copy {
+        max-width: 560px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .filter-card,
+      .results-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--card);
+        box-shadow: 0 12px 35px rgba(25, 51, 58, 0.045);
+      }
+
+      .filter-card {
+        padding: 24px;
+      }
+
+      .filter-heading {
+        margin: 0 0 20px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.35rem;
+        font-weight: 500;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 24px;
+      }
+
+      .field-label,
+      .measurements legend {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ink);
+        font-size: 0.82rem;
+        font-weight: 750;
+      }
+
+      select {
+        width: 100%;
+        min-height: 46px;
+        padding: 0 38px 0 13px;
+        border: 1px solid #d5ddd6;
+        border-radius: 9px;
+        background-color: white;
+        color: var(--ink);
+      }
+
+      select:focus-visible,
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid rgba(23, 107, 104, 0.28);
+        outline-offset: 2px;
+      }
+
+      .measurements {
+        grid-column: 1 / -1;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .measurement-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .measurement-option {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 39px;
+        padding: 7px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: #40585c;
+        cursor: pointer;
+        font-size: 0.84rem;
+      }
+
+      .measurement-option:has(input:checked) {
+        border-color: #b6d2c8;
+        background: var(--wash);
+        color: var(--teal-dark);
+      }
+
+      .measurement-option input {
+        margin: 0;
+        accent-color: var(--teal);
+      }
+
+      .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        grid-column: 1 / -1;
+        margin-top: 2px;
+      }
+
+      .button-primary {
+        min-height: 44px;
+        padding: 0 19px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--teal);
+        color: white;
+        cursor: pointer;
+        font-weight: 750;
+        transition: background 140ms ease, transform 140ms ease;
+      }
+
+      .button-primary:hover {
+        transform: translateY(-1px);
+        background: var(--teal-dark);
+      }
+
+      .button-reset {
+        padding: 8px 0;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 0.88rem;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .results-section {
+        margin-top: 34px;
+      }
+
+      .results-header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 0 2px 13px;
+      }
+
+      .results-header h2 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.6rem;
+        font-weight: 500;
+      }
+
+      .results-count {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .results-card {
+        overflow: hidden;
+      }
+
+      .table-scroll {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      th,
+      td {
+        padding: 16px 19px;
+        border-bottom: 1px solid #edf0e9;
+        white-space: nowrap;
+      }
+
+      th {
+        background: #f9faf6;
+        color: #617477;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      td {
+        font-size: 0.91rem;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .species-cell {
+        font-weight: 750;
+      }
+
+      .species-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 9px;
+        border-radius: 50%;
+        background: var(--coral);
+        vertical-align: 1px;
+      }
+
+      .empty-row {
+        padding: 28px 20px;
+        color: var(--muted);
+        text-align: center;
+        white-space: normal;
+      }
+
+      .sample-note {
+        margin: 13px 3px 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      footer {
+        padding-top: 22px;
+        border-top: 1px solid rgba(25, 51, 58, 0.12);
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      @media (max-width: 650px) {
+        .page-shell {
+          width: min(100% - 28px, 1120px);
+        }
+
+        .edition {
+          max-width: 125px;
+          text-align: right;
+        }
+
+        main {
+          padding-top: 42px;
+        }
+
+        .filter-card {
+          padding: 19px;
+        }
+
+        .filter-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .measurements,
+        .filter-actions {
+          grid-column: auto;
+        }
+
+        th,
+        td {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">P</span>
+          <span>Penguin Field Notes</span>
+        </div>
+        <span class="edition">A small species explorer</span>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <p class="eyebrow">Species comparison · Antarctic field guide</p>
+          <h1 id="page-title">Get to know your penguins.</h1>
+          <p class="intro-copy">
+            Compare a few physical measurements by species and island. Choose
+            what you want to explore, then scan the results side by side.
+          </p>
+        </section>
+
+        <form class="filter-card" id="filters">
+          <h2 class="filter-heading">Shape your comparison</h2>
+          <div class="filter-grid">
+            <div>
+              <label class="field-label" for="species">Penguin species</label>
+              <select id="species" name="species">
+                <option value="">All species</option>
+                <option value="Adelie">Adelie</option>
+                <option value="Chinstrap">Chinstrap</option>
+                <option value="Gentoo">Gentoo</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="island">Island</label>
+              <select id="island" name="island">
+                <option value="">All islands</option>
+                <option value="Biscoe">Biscoe</option>
+                <option value="Dream">Dream</option>
+                <option value="Torgersen">Torgersen</option>
+              </select>
+            </div>
+            <fieldset class="measurements">
+              <legend>Measurements to show</legend>
+              <div class="measurement-options">
+                <label class="measurement-option">
+                  <input type="checkbox" name="measurement" value="billLength" checked>
+                  Bill length
+                </label>
+                <label class="measurement-option">
+                  <input type="checkbox" name="measurement" value="billDepth" checked>
+                  Bill depth
+                </label>
+                <label class="measurement-option">
+                  <input type="checkbox" name="measurement" value="flipperLength" checked>
+                  Flipper length
+                </label>
+                <label class="measurement-option">
+                  <input type="checkbox" name="measurement" value="bodyMass" checked>
+                  Body mass
+                </label>
+              </div>
+            </fieldset>
+            <div class="filter-actions">
+              <button class="button-primary" type="submit">Show penguins</button>
+              <button class="button-reset" id="reset-filters" type="button">Reset filters</button>
+            </div>
+          </div>
+        </form>
+
+        <section class="results-section" aria-labelledby="results-title">
+          <div class="results-header">
+            <h2 id="results-title">Your results</h2>
+            <span class="results-count" id="result-count" aria-live="polite"></span>
+          </div>
+          <div class="results-card">
+            <div class="table-scroll">
+              <table>
+                <thead id="results-head"></thead>
+                <tbody id="results-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="sample-note">
+            Measurements are from the
+            <a href="https://github.com/rfordatascience/tidytuesday/tree/main/data/2020/2020-07-28"
+               target="_blank" rel="noopener noreferrer">Palmer Penguins dataset</a>.
+            A dash means the source value was missing.
+          </p>
+        </section>
+      </main>
+
+      <footer>
+        A student project for exploring how penguin species differ.
+      </footer>
+    </div>
+
+    <script>
+      const measurementColumns = {
+        billLength: { label: "Bill length (mm)", format: value => value.toFixed(1) },
+        billDepth: { label: "Bill depth (mm)", format: value => value.toFixed(1) },
+        flipperLength: { label: "Flipper length (mm)", format: value => String(value) },
+        bodyMass: { label: "Body mass (g)", format: value => value.toLocaleString() }
+      };
+
+      const filters = document.querySelector("#filters");
+      const resultsHead = document.querySelector("#results-head");
+      const resultsBody = document.querySelector("#results-body");
+      const resultCount = document.querySelector("#result-count");
+      let penguinRows = [];
+      let latestRequest = 0;
+
+      function renderResults(rows, errorMessage = null) {
+        const selectedMeasurements = Array.from(
+          filters.querySelectorAll('input[name="measurement"]:checked'),
+          input => input.value
+        );
+
+        resultsHead.replaceChildren();
+        resultsBody.replaceChildren();
+
+        const headerRow = document.createElement("tr");
+        ["Species", "Island"].forEach(label => {
+          const heading = document.createElement("th");
+          heading.scope = "col";
+          heading.textContent = label;
+          headerRow.append(heading);
+        });
+        selectedMeasurements.forEach(key => {
+          const heading = document.createElement("th");
+          heading.scope = "col";
+          heading.textContent = measurementColumns[key].label;
+          headerRow.append(heading);
+        });
+        resultsHead.append(headerRow);
+
+        if (errorMessage) {
+          resultCount.textContent = "Could not load results";
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.className = "empty-row";
+          cell.colSpan = 2 + selectedMeasurements.length;
+          cell.textContent = errorMessage;
+          row.append(cell);
+          resultsBody.append(row);
+          return;
+        }
+
+        resultCount.textContent = `${rows.length} ${rows.length === 1 ? "penguin" : "penguins"} shown`;
+
+        if (rows.length === 0) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.className = "empty-row";
+          cell.colSpan = 2 + selectedMeasurements.length;
+          cell.textContent = "No sample penguins match these filters. Try another species or island.";
+          row.append(cell);
+          resultsBody.append(row);
+          return;
+        }
+
+        rows.forEach(penguin => {
+          const row = document.createElement("tr");
+          const speciesCell = document.createElement("td");
+          speciesCell.className = "species-cell";
+          const speciesDot = document.createElement("span");
+          speciesDot.className = "species-dot";
+          speciesDot.setAttribute("aria-hidden", "true");
+          speciesCell.append(speciesDot, document.createTextNode(penguin.species));
+          row.append(speciesCell);
+
+          const islandCell = document.createElement("td");
+          islandCell.textContent = penguin.island;
+          row.append(islandCell);
+
+          selectedMeasurements.forEach(key => {
+            const cell = document.createElement("td");
+            const value = penguin[key];
+            cell.textContent = value === null || value === undefined
+              ? "—"
+              : measurementColumns[key].format(value);
+            row.append(cell);
+          });
+          resultsBody.append(row);
+        });
+      }
+
+      async function loadPenguins() {
+        const requestNumber = ++latestRequest;
+        const parameters = new URLSearchParams();
+        const species = filters.elements.species.value;
+        const island = filters.elements.island.value;
+        if (species) parameters.set("species", species);
+        if (island) parameters.set("island", island);
+        resultCount.textContent = "Loading penguins...";
+
+        try {
+          const response = await fetch(`/api/penguins?${parameters.toString()}`);
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || `The server returned ${response.status}.`);
+          }
+          if (!Array.isArray(result)) {
+            throw new Error("The server returned an unexpected response.");
+          }
+          if (requestNumber !== latestRequest) return;
+          penguinRows = result;
+          renderResults(penguinRows);
+        } catch (error) {
+          if (requestNumber !== latestRequest) return;
+          console.error("Could not load penguins:", error);
+          penguinRows = [];
+          renderResults(
+            [],
+            "Could not reach the database. Make sure you have loaded the dataset and try again."
+          );
+        }
+      }
+
+      filters.addEventListener("submit", event => {
+        event.preventDefault();
+        loadPenguins();
+      });
+
+      filters.querySelectorAll("select").forEach(input => {
+        input.addEventListener("change", loadPenguins);
+      });
+
+      filters.querySelectorAll("input[name='measurement']").forEach(input => {
+        input.addEventListener("change", () => renderResults(penguinRows));
+      });
+
+      document.querySelector("#reset-filters").addEventListener("click", () => {
+        filters.reset();
+        loadPenguins();
+      });
+
+      loadPenguins();
+    </script>
+  </body>
+</html>
